@@ -1,0 +1,85 @@
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+public class MarthClient {
+    private Socket socket = null;
+    private DataInputStream input = null;
+    private DataOutputStream out = null;
+
+    public MarthClient(String address, int port) {
+        try {
+            socket = new Socket(address, port);
+            System.out.println("Kết nối thành công");
+
+            input = new DataInputStream(System.in);
+
+            out = new DataOutputStream(socket.getOutputStream());
+        } 
+        catch (UnknownHostException u) {
+            System.out.println(u);
+            return;
+        } 
+        catch (IOException i) {
+            System.out.println(i);
+            return;
+        }
+
+        String line = "";
+
+        while (!line.equals("Over")) {
+            try {
+                line = input.readLine();
+                out.writeUTF(line);
+            } 
+            catch (IOException i) {
+                System.out.println(i);
+            }
+        }
+
+        try {
+            input.close();
+            out.close();
+            socket.close();
+        } 
+        catch (IOException i) {
+            System.out.println(i);
+        }
+    }
+
+    public static void main(String args[]) {
+    	MarthClient client = new MarthClient("127.0.0.1", 5000);
+    	try {
+            Socket socket = new Socket("127.0.0.1", 5000);
+
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+
+            Scanner scanner = new Scanner(System.in);
+            
+            System.out.println("Nhập số thứ nhất (a): ");
+            int a = scanner.nextInt();
+            System.out.println("Nhập số thứ hai (b): ");
+            int b = scanner.nextInt();
+            System.out.println("Nhập số thứ ba (c): ");
+            int c = scanner.nextInt();
+            
+            output.writeInt(a);
+            output.writeInt(b);
+            output.writeInt(c);
+
+            int sum = input.readInt();
+            String equationResult = input.readUTF();
+
+            System.out.println("Tổng hai số a và b là: " + sum);
+            System.out.println("Kết quả phương trình bậc hai: " + equationResult);
+
+            scanner.close();
+            input.close();
+            output.close();
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
